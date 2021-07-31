@@ -73,7 +73,11 @@ class TmxNano2040Wifi(threading.Thread):
         self.the_reporter_thread = threading.Thread(target=self._reporter)
         self.the_reporter_thread.daemon = True
 
+        self.shutdown_on_exception = shutdown_on_exception
+
         if not ip_address:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('An IP Address MUST BE SPECIFIED')
 
         self.ip_address = ip_address
@@ -84,6 +88,11 @@ class TmxNano2040Wifi(threading.Thread):
         # valid pins
         # sda = 18 only for i2c (A4)
         # scl = 19 only for i2c (A5)
+        # spi miso - D11 -D17
+        # spi mosi - D12
+        # spi clock -D13
+        # (CS / SS) - Any GPIO(except for A4 - A7)
+        # NeoPixel D2 - D
         # digital output pins are 0-17
         # digital input pins are 0-17, 20 and 21
         # analog pins are a0-a7 (a4, a5, a6, a7 are in the WifiNINA chip)
@@ -99,6 +108,16 @@ class TmxNano2040Wifi(threading.Thread):
 
         self.analog_pins = [x for x in range(8)]
 
+        # map the D pin number to the GPIO pin number
+        self.d_to_g_pin_map = {2: 25, 3: 15, 4: 16, 5: 17, 6: 18, 7: 19,
+                               8: 20, 9: 21, 10: 5, 11: 7, 12: 4,
+                               13: 6, 14: 26, 15: 27, 16: 28, 17: 29}
+
+        # map a gpio pin to a digital pin
+        self.g_to_d_pin_map = {25: 2, 15: 3, 16: 4, 17: 5, 18: 6, 19: 7,
+                               20: 8, 21: 9, 5: 10, 7: 11, 4: 12,
+                               6: 13, 26: 14, 27: 15, 28: 16, 29: 17}
+
         self.the_data_receive_thread = threading.Thread(target=self._tcp_receiver)
 
         self.the_data_receive_thread.daemon = True
@@ -112,6 +131,8 @@ class TmxNano2040Wifi(threading.Thread):
             if python_version[1] >= 7:
                 pass
             else:
+                if self.shutdown_on_exception:
+                    self.shutdown()
                 raise RuntimeError("ERROR: Python 3.7 or greater is "
                                    "required for use of this program.")
 
@@ -215,7 +236,6 @@ class TmxNano2040Wifi(threading.Thread):
         try:
             self.sock.settimeout(8)
             self.sock.connect((self.ip_address, self.ip_port))
-            #self.sock.settimeout(None)
         except socket.timeout:
             print(f'Could not establish a connection to {self.ip_address}:{self.ip_port}')
             try:
@@ -500,12 +520,18 @@ class TmxNano2040Wifi(threading.Thread):
 
         """
         if not self.neopixels_initiated:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('You must call set_pin_mode_neopixel first')
 
         if pixel_number > self.number_of_pixels:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('Pixel number is out of legal range')
 
         if r and g and b not in range(256):
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('Pixel value must be in the range of 0-255')
 
         command = [PrivateConstants.SET_NEO_PIXEL, pixel_number, r, g, b, auto_show]
@@ -522,6 +548,8 @@ class TmxNano2040Wifi(threading.Thread):
 
         """
         if not self.neopixels_initiated:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('You must call set_pin_mode_neopixel first')
         command = [PrivateConstants.CLEAR_ALL_NEO_PIXELS, auto_show]
         self._send_command(command)
@@ -541,8 +569,12 @@ class TmxNano2040Wifi(threading.Thread):
         :param auto_show: call show automatically
         """
         if not self.neopixels_initiated:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('You must call set_pin_mode_neopixel first')
         if r and g and b not in range(256):
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('Pixel value must be in the range of 0-255')
         command = [PrivateConstants.FILL_ALL_NEO_PIXELS, r, g, b, auto_show]
         self._send_command(command)
@@ -556,6 +588,8 @@ class TmxNano2040Wifi(threading.Thread):
 
         """
         if not self.neopixels_initiated:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('You must call set_pin_mode_neopixel first')
         command = [PrivateConstants.SHOW_NEO_PIXELS]
         self._send_command(command)
@@ -583,6 +617,8 @@ class TmxNano2040Wifi(threading.Thread):
 
         """
         if pin_number not in self.digital_output_pins:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('Illegal pin for analog output')
         self._set_pin_mode(pin_number, PrivateConstants.AT_OUTPUT)
 
@@ -606,6 +642,8 @@ class TmxNano2040Wifi(threading.Thread):
 
         """
         if pin_number not in self.analog_pins:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('Illegal pin number for analog input.')
         self._set_pin_mode(pin_number, PrivateConstants.AT_ANALOG, differential,
                            callback)
@@ -627,6 +665,8 @@ class TmxNano2040Wifi(threading.Thread):
 
         """
         if pin_number not in self.digital_input_pins:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('Illegal pin number for digital input.')
         self._set_pin_mode(pin_number, PrivateConstants.AT_INPUT, callback=callback)
 
@@ -647,6 +687,8 @@ class TmxNano2040Wifi(threading.Thread):
 
         """
         if pin_number not in self.digital_input_pins:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('Illegal pin number for digital input.')
         self._set_pin_mode(pin_number, PrivateConstants.AT_INPUT_PULLUP,
                            callback=callback)
@@ -658,6 +700,8 @@ class TmxNano2040Wifi(threading.Thread):
         :param pin_number: arduino pin number
         """
         if pin_number not in self.digital_output_pins:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('Illegal pin number for digital output.')
         self._set_pin_mode(pin_number, PrivateConstants.AT_OUTPUT)
 
@@ -690,6 +734,8 @@ class TmxNano2040Wifi(threading.Thread):
         """
         if enable:
             if not callback:
+                if self.shutdown_on_exception:
+                    self.shutdown()
                 raise RuntimeError('A callback must be specified for set_pin_mode_imu')
 
         command = [PrivateConstants.IMU_ENABLE, enable]
@@ -717,6 +763,8 @@ class TmxNano2040Wifi(threading.Thread):
         """
         if enable:
             if not callback:
+                if self.shutdown_on_exception:
+                    self.shutdown()
                 raise RuntimeError(
                     'A callback must be specified for set_pin_mode_microphone')
         self.microphone_callback = callback
@@ -736,7 +784,7 @@ class TmxNano2040Wifi(threading.Thread):
 
         Default: Set all the pixels to off.
 
-        :param pin_number: neopixel GPIO control pin
+        :param pin_number: neopixel control pin. Must be in the range of 2-17
 
         :param num_pixels: number of pixels in the strip
 
@@ -748,17 +796,30 @@ class TmxNano2040Wifi(threading.Thread):
 
 
         """
+        # check for a valid neopixel pin number
+        if not (2 < pin_number <= 17):
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError('NeoPixel pin must be in the range of 2 - 17')
+
+        pin = self.d_to_g_pin_map[pin_number]
+
+        if self.neopixels_initiated:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError('Neopixels previously initialized')
+
         if fill_r or fill_g or fill_g not in range(256):
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('Pixel value must be in the range of 0-255')
 
         self.number_of_pixels = num_pixels
 
-        command = [PrivateConstants.INITIALIZE_NEO_PIXELS, pin_number,
+        command = [PrivateConstants.INITIALIZE_NEO_PIXELS, pin,
                    self.number_of_pixels, fill_r, fill_g, fill_b]
 
         self._send_command(command)
-
-        self.pico_pins[pin_number] = PrivateConstants.AT_NEO_PIXEL
 
         self.neopixels_initiated = True
 
@@ -776,6 +837,8 @@ class TmxNano2040Wifi(threading.Thread):
 
         """
         if pin_number not in self.digital_output_pins:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('Illegal pin number for servo operation.')
         minv = (min_pulse).to_bytes(2, byteorder="big")
         maxv = (max_pulse).to_bytes(2, byteorder="big")
@@ -803,11 +866,24 @@ class TmxNano2040Wifi(threading.Thread):
                 self.shutdown()
             raise RuntimeError('set_pin_mode_sonar: A Callback must be specified')
 
+        if not 2 < trigger_pin <= 17:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError('Trigger Pin must be between 2 and 17')
+
+        if not 2 < echo_pin <= 17:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError('Trigger Pin must be between 2 and 17')
+
+        trigger = self.d_to_g_pin_map[trigger_pin]
+        echo = self.d_to_g_pin_map[echo_pin]
+
         if self.sonar_count < PrivateConstants.MAX_SONARS - 1:
             self.sonar_callbacks[trigger_pin] = callback
             self.sonar_count += 1
 
-            command = [PrivateConstants.SONAR_NEW, trigger_pin, echo_pin]
+            command = [PrivateConstants.SONAR_NEW, trigger, echo]
             self._send_command(command)
         else:
             if self.shutdown_on_exception:
@@ -1107,15 +1183,18 @@ class TmxNano2040Wifi(threading.Thread):
 
         :param report: data[0] = trigger pin, data[1] and data[2] = distance
 
-        callback report format: [PrivateConstants.SONAR_DISTANCE, trigger_pin, distance_value, time_stamp]
+        callback report format: [PrivateConstants.SONAR_DISTANCE, trigger_pin,
+                                 distance_integer_portion,
+                                 distance_fractional_portion, time_stamp]
         """
 
         # get callback from pin number
-        cb = self.sonar_callbacks[report[0]]
+        pin = self.g_to_d_pin_map[report[0]]
+        cb = self.sonar_callbacks[pin]
 
         # build report data
-        cb_list = [PrivateConstants.SONAR_DISTANCE, report[0],
-                   ((report[1] << 8) + report[2]), time.time()]
+        cb_list = [PrivateConstants.SONAR_DISTANCE, pin,
+                   float(report[1] + report[2] / 100), time.time()]
 
         cb(cb_list)
 
@@ -1131,6 +1210,8 @@ class TmxNano2040Wifi(threading.Thread):
 
         # imu error reported
         if report[2] == 99:
+            if self.shutdown_on_exception:
+                self.shutdown()
             raise RuntimeError('IMU ERROR')
 
         ax = float(report[10] + report[1] / 100)
