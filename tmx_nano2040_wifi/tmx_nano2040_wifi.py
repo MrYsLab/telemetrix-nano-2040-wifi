@@ -495,6 +495,11 @@ class TmxNano2040Wifi(threading.Thread):
                 self.shutdown()
             raise RuntimeError('I2C Read: A callback function must be specified.')
 
+        if not self.i2c_active:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError(
+                'I2C read: set_pin_mode i2c never called.')
         self.i2c_callback = callback
 
         if not register:
