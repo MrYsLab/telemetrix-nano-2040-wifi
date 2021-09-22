@@ -1,5 +1,5 @@
 """
- Copyright (c) 2020 Alan Yorinks All rights reserved.
+ Copyright (c) 2021 Alan Yorinks All rights reserved.
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -21,14 +21,15 @@ from tmx_nano2040_wifi import tmx_nano2040_wifi
 
 """
 This example sets up and control an ADXL345 i2c accelerometer.
-It will continuously print data the raw xyz data from the device.
+It will continuously print the raw xyz data from the device.
 """
 
 
 # the call back function to print the adxl345 data
 def the_callback(data):
     """
-    Data is supplied by the library.
+    The callback function.
+
     :param data: [report_type, Device address, device read register,
     number of bytes returned, x data pair, y data pair, z data pair
     time_stamp]
@@ -48,6 +49,8 @@ def the_callback(data):
 def adxl345(my_board):
     # setup adxl345
     # device address = 83
+
+    # initialize i2c pins
     my_board.set_pin_mode_i2c()
 
     # set up power and control register
@@ -62,19 +65,19 @@ def adxl345(my_board):
     my_board.i2c_write(83, [49, 3])
     time.sleep(.1)
 
-    # read_count = 20
     while True:
         # read 6 bytes from the data register
         try:
             my_board.i2c_read(83, 50, 6, the_callback)
-            time.sleep(.1)
+            time.sleep(.5)
 
-        except (KeyboardInterrupt, RuntimeError):
+        except BrokenPipeError:
+            raise RuntimeError('Is the i2c device connected properly?')
             my_board.shutdown()
             sys.exit(0)
 
 
-board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.174')
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
 try:
     adxl345(board)
 except KeyboardInterrupt:
