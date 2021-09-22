@@ -23,14 +23,12 @@ from tmx_nano2040_wifi import tmx_nano2040_wifi
 """
 This is an example program for HC-SR04 type distance sensors.
 
-A single device was tested attaching  a device to pins 16 and  17 
-Pins  2, 3, 4, 5, 6,  7  have no HC-SR04 attached, but demonstrate
- that multiple device may be attached simultaneously. 
+A single device was tested.
 """
 
 # some globals
-TRIGGER_PIN = 12
-ECHO_PIN = 11
+TRIGGER_PIN = 11
+ECHO_PIN = 12
 
 # indices into callback data
 TRIGGER = 1
@@ -46,7 +44,7 @@ def the_callback(data):
 
 
 # Create a Telemetrix instance.
-board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.174')
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
 try:
     # instantiate HC-SR04 devices
     board.set_pin_mode_sonar(TRIGGER_PIN, ECHO_PIN, the_callback)
