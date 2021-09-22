@@ -14,8 +14,6 @@
  along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
- DHT support courtesy of Martyn Wheeler
- Based on the DHTNew library - https://github.com/RobTillaart/DHTNew
 """
 
 import sys
@@ -28,13 +26,14 @@ Attach a pin to a servo and move it about.
 """
 
 # some globals
-SERVO_PIN = 12
+SERVO_PIN = 11
 
 
 # Create a Telemetrix instance.
-board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.174')
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
 try:
     board.set_pin_mode_servo(SERVO_PIN, 1000, 2000)
+
     time.sleep(1)
     board.servo_write(SERVO_PIN, 90)
     time.sleep(1)
@@ -43,6 +42,7 @@ try:
     board.servo_write(SERVO_PIN, 180)
     time.sleep(1)
     board.servo_write(SERVO_PIN, 90)
+    board.servo_detach(11)
 except KeyboardInterrupt:
     board.shutdown()
     sys.exit(0)
