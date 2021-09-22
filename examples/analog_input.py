@@ -59,7 +59,7 @@ def analog_in(my_board, pin):
      analog input. Any changes on this pin will
      be reported through the call back function.
 
-     :param my_board: a pymata4 instance
+     :param my_board: a tmx_nano2040_wifi instance
      :param pin: Arduino pin number
      """
 

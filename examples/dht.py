@@ -71,7 +71,7 @@ def dht(my_board, pin, callback):
         Set the pin mode for a DHT 22 device. Results will appear via the
         callback.
 
-        :param my_board: an pymata express instance
+        :param my_board: a tmx_nano2040_wifi instance
         :param pin: Arduino pin number
         :param callback: The callback function
         """
