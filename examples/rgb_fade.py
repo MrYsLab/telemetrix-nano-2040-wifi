@@ -16,13 +16,19 @@
 
 """
 
+# Fade the 3 colors of the onboard RGB LED.
+
 import sys
 import time
 
 from tmx_nano2040_wifi import tmx_nano2040_wifi
 
+# pin numbers for the LEDs
+LED_G = 25  # green
+LED_B = 26  # blue
+LED_R = 27  # red
 # Create a Telemetrix instance.
-board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.174')
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
 
 # For RGB control, the pin mode must be set as output and
 # performed in the setup function of the Arduino sketch. This
@@ -37,9 +43,21 @@ try:
             board.analog_write(pin, i)
             time.sleep(.005)
         time.sleep(1)
+
         for i in range(255):
             board.analog_write(pin, i)
             time.sleep(.005)
+        board.digital_write(pin, 0)
+    board.set_pin_mode_digital_output(LED_G)
+    board.digital_write(LED_G, 1)
+    board.digital_write(LED_G, 0)
+
+    board.set_pin_mode_digital_output(LED_B)
+    board.digital_write(LED_B, 1)
+    board.digital_write(LED_B, 0)
+    board.set_pin_mode_digital_output(LED_R)
+    board.digital_write(LED_R, 1)
+    board.digital_write(LED_R, 0)
     board.shutdown()
     sys.exit(0)
 except KeyboardInterrupt:
