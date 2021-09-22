@@ -302,17 +302,16 @@ class TmxNano2040Wifi(threading.Thread):
         """
         Set the specified pin to the specified value.
 
-        The maximum value for the Nano RP2040 is 256 and
-        you should validate this in your application.
+        The maximum value for the Nano RP2040 is 256.
 
-        The value accepts up to 16 bits for future expansion.
 
         :param pin: arduino pin number
 
-        :param value: pin value (maximum 16 bits)
+        :param value: pin value (maximum 255)
 
         """
-
+        if value > 255:
+            raise RuntimeError('Maximum value for analog_write is 255')
         command = [PrivateConstants.ANALOG_WRITE, pin, value]
         self._send_command(command)
 
