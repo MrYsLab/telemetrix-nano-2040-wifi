@@ -13,10 +13,8 @@
  You should have received a copy of the GNU AFFERO GENERAL PUBLIC LICENSE
  along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
- DHT support courtesy of Martyn Wheeler
- Based on the DHTNew library - https://github.com/RobTillaart/DHTNew
 """
+
 
 import sys
 import time
@@ -32,7 +30,7 @@ Setup a pin for output and fade its intensity
 DIGITAL_PIN = 13
 
 # Create a Telemetrix instance.
-board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.106')
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
 
 # Set the DIGITAL_PIN as an output pin
 board.set_pin_mode_analog_output(DIGITAL_PIN)
