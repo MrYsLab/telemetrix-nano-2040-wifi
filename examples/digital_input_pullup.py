@@ -14,8 +14,6 @@
  along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
- DHT support courtesy of Martyn Wheeler
- Based on the DHTNew library - https://github.com/RobTillaart/DHTNew
 """
 
 import sys
@@ -51,17 +49,17 @@ def the_callback(data):
           f'Value: {data[CB_VALUE]} Time Stamp: {date}')
 
 
-board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.174')
-board.set_pin_mode_digital_input_pullup(12, the_callback)
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
+board.set_pin_mode_digital_input_pullup(11, the_callback)
 
 try:
     print('Reporting enabled for 5 seconds.')
     time.sleep(5)
-    print('Disabling reporting for pin 12 3 seconds. All others enabled')
-    board.disable_digital_reporting(12)
+    print('Disabling reporting for 3 seconds.')
+    board.disable_digital_reporting(11)
     time.sleep(3)
-    print('Re-enabling reporting for pin 12.')
-    board.enable_digital_reporting(12)
+    print('Re-enabling reporting.')
+    board.enable_digital_reporting(11)
     while True:
         time.sleep(5)
 
