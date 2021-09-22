@@ -558,7 +558,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     def neo_pixel_set_value(self, pixel_number, r=0, g=0, b=0, auto_show=False):
         """
-        Set the selected pixel in the pixel array on the Pico to
+        Set the selected pixel in the pixel array on the Nano rp2040 to
         the value provided.
 
         Note: before using this method, you must initialize the neopixel
