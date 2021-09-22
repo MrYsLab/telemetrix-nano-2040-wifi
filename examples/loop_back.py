@@ -21,7 +21,7 @@ from tmx_nano2040_wifi import tmx_nano2040_wifi
 
 """
 Loopback some data to assure that data can be sent and received between
-the Telemetrix client and arduino-telemetrix server.
+the Telemetrix client and Telemetrix server.
 """
 
 
@@ -52,7 +52,7 @@ def loop_back(my_board, loop_back_data):
         sys.exit(0)
 
 
-board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.174')
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
 char_list = ['A', 'B', 'Z']
 try:
     loop_back(board, char_list)
