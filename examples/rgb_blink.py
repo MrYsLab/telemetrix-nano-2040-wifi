@@ -14,8 +14,6 @@
  along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
- DHT support courtesy of Martyn Wheeler
- Based on the DHTNew library - https://github.com/RobTillaart/DHTNew
 """
 
 import sys
@@ -23,16 +21,22 @@ import time
 
 from tmx_nano2040_wifi import tmx_nano2040_wifi
 
+# Blink each of the colors of the onboard RGB LED.
+
 # pin numbers for the LEDs
 LED_G = 25  # green
 LED_B = 26  # blue
 LED_R = 27  # red
 
 # Create a Telemetrix instance.
-board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.174')
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
 
 # RGB pins are already established as outputs in the Arduino sketch.
 # Blink each LED twice.
+
+board.set_pin_mode_digital_output(LED_G)
+board.set_pin_mode_digital_output(LED_B)
+board.set_pin_mode_digital_output(LED_R)
 
 for pin in range(LED_G, LED_R+1):
     for blink in range(2):
