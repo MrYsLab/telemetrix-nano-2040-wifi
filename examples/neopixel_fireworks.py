@@ -26,7 +26,7 @@ from tmx_nano2040_wifi import tmx_nano2040_wifi
 """
 This program demonstrates using a NeoPixel strip of 8 pixels.
 """
-PIN = 4
+PIN = 11
 NUM_PIXELS = 8
 
 # A list to hold a pixel number and its RBG values
@@ -52,7 +52,7 @@ def get_random_pixel_and_color():
 
 
 # instantiate a board object
-board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.174')
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
 
 # initialize the neopixel object
 board.set_pin_mode_neopixel(PIN, NUM_PIXELS)
