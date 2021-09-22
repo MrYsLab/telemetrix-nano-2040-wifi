@@ -54,6 +54,7 @@ class PrivateConstants:
     SPI_READ_BLOCKING = 28
     SPI_SET_FORMAT = 29
     SPI_CS_CONTROL = 30
+    DHT_NEW = 31
 
     # reports
     # debug data from Arduino
@@ -68,6 +69,8 @@ class PrivateConstants:
     SONAR_DISTANCE = 11
     IMU_REPORT = 12
     MICROPHONE_REPORT = 13
+    DHT_REPORT = 14
+    SPI_REPORT = 15
 
     DEBUG_PRINT = 99
 
@@ -111,3 +114,9 @@ class PrivateConstants:
     LED_G = 25
     LED_B = 26
 
+    # maximum number of DHT devices allowed
+    MAX_DHTS = 2
+
+    # DHT Report sub-types
+    DHT_DATA = 0
+    DHT_ERROR = 1

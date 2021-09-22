@@ -1,6 +1,6 @@
 # noinspection GrazieInspection
 """
- Copyright (c) 2020 Alan Yorinks All rights reserved.
+ Copyright (c) 2021 Alan Yorinks All rights reserved.
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -35,32 +35,50 @@ from tmx_nano2040_wifi.private_constants import PrivateConstants
 # noinspection PyPep8,PyMethodMayBeStatic,GrazieInspection,PyBroadException
 class TmxNano2040Wifi(threading.Thread):
     """
-    This class exposes and implements the telemetrix API.
-    It uses threading to accommodate concurrency.
+    This class exposes and implements the telemetrix API for the
+    Arduino Nano RP2040 Connect using threading for concurrency.
+
     It includes the public API methods as well as
     a set of private methods.
 
     """
 
     # noinspection PyPep8,PyPep8,PyPep8
-    def __init__(self, arduino_wait=6,
+    def __init__(self, arduino_wait=1,
                  sleep_tune=0.000001,
                  shutdown_on_exception=True,
+                 reset_board_on_shutdown=True,
                  ip_address=None, ip_port=31335):
 
         """
-        :param arduino_wait: wait time for Arduino to reset itself
+        In general, you may accept all of the default parameter values.
 
-        :param sleep_tune: A tuning parameter (typically not changed by user)
+        :param arduino_wait: wait time for Arduino to reset itself.
+                             The time is specified in seconds. Increase
+                             this value if your application does not
+                             locate the Nano Connect.
+
+        :param sleep_tune: A tuning parameter (typically not changed
+                           the by user)
 
         :param shutdown_on_exception: call shutdown before raising
                                       a RunTimeError exception, or
-                                      receiving a KeyboardInterrupt exception
+                                      receiving a KeyboardInterrupt exception.
+                                      Set this to False if you wish to handle
+                                      exceptions and not shut down the application.
+
+        :param reset_board_on_shutdown: if True, a hardware reset  of the board is
+                                        performed when the shutdown method is called.
+                                        If set to False, restarting your program may
+                                        not work as expected since onboard
+                                        devices may no longer respond. Resetting the
+                                        board solves this issue.
 
         :param ip_address: ip address of tcp/ip connected device.
-                           This is a required parameter
+                           This parameter is required to be supplied.
 
-        :param ip_port: ip port of tcp/ip connected device
+        :param ip_port: ip port of tcp/ip connected device. In general
+                        you do not need to alter the default value.
         """
 
         # initialize threading parent
@@ -73,7 +91,10 @@ class TmxNano2040Wifi(threading.Thread):
         self.the_reporter_thread = threading.Thread(target=self._reporter)
         self.the_reporter_thread.daemon = True
 
+        # save the input parameter values
         self.shutdown_on_exception = shutdown_on_exception
+
+        self.reset_board_on_shutdown = reset_board_on_shutdown
 
         if not ip_address:
             if self.shutdown_on_exception:
@@ -83,32 +104,40 @@ class TmxNano2040Wifi(threading.Thread):
         self.ip_address = ip_address
         self.ip_port = ip_port
 
+        # flags to indicate if a feature was activated
         self.i2c_active = False
+
+        self.spi_enabled = False
 
         # valid pins
         # sda = 18 only for i2c (A4)
         # scl = 19 only for i2c (A5)
-        # spi miso - D11 -D17
+        # spi miso - D11
         # spi mosi - D12
         # spi clock -D13
-        # (CS / SS) - Any GPIO(except for A4 - A7)
+        # (CS / SS) - D0-D10,
         # NeoPixel D2 - D
         # digital output pins are 0-17
         # digital input pins are 0-17, 20 and 21
         # analog pins are a0-a7 (a4, a5, a6, a7 are in the WifiNINA chip)
         # RGB are pseudo pins defined in private_constants.py
 
+        # A list of valid digital input pins plus the pins in the
+        # non-contiguous range.
         self.digital_input_pins = [x for x in range(18)]
         self.digital_input_pins.extend([20, 21])
 
+        # A list of valid digital output pins plus the pins in the
+        # non-contiguous range.
         self.digital_output_pins = [x for x in range(18)]
         self.digital_output_pins.extend([PrivateConstants.LED_G,
                                          PrivateConstants.LED_B,
                                          PrivateConstants.LED_R])
 
+        # A list of valid analog input pins
         self.analog_pins = [x for x in range(8)]
 
-        # map the D pin number to the GPIO pin number
+        # map the Digital pin number to the GPIO pin number
         self.d_to_g_pin_map = {2: 25, 3: 15, 4: 16, 5: 17, 6: 18, 7: 19,
                                8: 20, 9: 21, 10: 5, 11: 7, 12: 4,
                                13: 6, 14: 26, 15: 27, 16: 28, 17: 29}
@@ -118,6 +147,16 @@ class TmxNano2040Wifi(threading.Thread):
                                20: 8, 21: 9, 5: 10, 7: 11, 4: 12,
                                6: 13, 26: 14, 27: 15, 28: 16, 29: 17}
 
+        # A list of valid SPI chip select pins.
+        self.valid_spi_cs_pins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        # A list of spi chip selected pins that have been enabled.
+        self.cs_pins_enabled = []
+
+        # User supplied callback method for SPI
+        self.spi_callback = None
+
+        # create a thread to receive incoming data
         self.the_data_receive_thread = threading.Thread(target=self._tcp_receiver)
 
         self.the_data_receive_thread.daemon = True
@@ -176,6 +215,10 @@ class TmxNano2040Wifi(threading.Thread):
             {PrivateConstants.IMU_REPORT: self._imu_report})
         self.report_dispatch.update(
             {PrivateConstants.MICROPHONE_REPORT: self._microphone_report})
+        self.report_dispatch.update(
+            {PrivateConstants.DHT_REPORT: self._dht_report})
+        self.report_dispatch.update(
+            {PrivateConstants.SPI_REPORT: self._spi_report})
 
         # dictionaries to store the callbacks for each pin
         self.analog_callbacks = {}
@@ -189,6 +232,11 @@ class TmxNano2040Wifi(threading.Thread):
         self.sonar_callbacks = {}
 
         self.sonar_count = 0
+
+        # dht specific variables
+        self.dht_callbacks = {}
+
+        self.dht_count = 0
 
         # imu variables
         self.imu_callback = None
@@ -250,29 +298,14 @@ class TmxNano2040Wifi(threading.Thread):
         # allow the threads to run
         self._run_threads()
 
-        # get telemetrix firmware version and print it
-        print('\nRetrieving Telemetrix4Connect2040 firmware ID...')
-        self._get_firmware_version()
-        if not self.firmware_version:
-            self._get_firmware_version()
-            if not self.firmware_version:
-                if self.shutdown_on_exception:
-                    self.shutdown()
-                raise RuntimeError(f'Telemetrix4Connect2040 firmware version')
-
-        else:
-            print(f'Telemetrix4Connect2040 firmware version: {self.firmware_version[0]}.'
-                  f'{self.firmware_version[1]}.{self.firmware_version[2]}')
-        command = [PrivateConstants.ENABLE_ALL_REPORTS]
-        self._send_command(command)
-
-        # Have the server reset its data structures
-        # command = [PrivateConstants.RESET]
-        # self._send_command(command)
-
     def analog_write(self, pin, value):
         """
         Set the specified pin to the specified value.
+
+        The maximum value for the Nano RP2040 is 256 and
+        you should validate this in your application.
+
+        The value accepts up to 16 bits for future expansion.
 
         :param pin: arduino pin number
 
@@ -285,7 +318,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     def digital_write(self, pin, value):
         """
-        Set the specified pin to the specified value.
+        Set the specified digital pin to the specified value.
 
         :param pin: arduino pin number
 
@@ -306,9 +339,10 @@ class TmxNano2040Wifi(threading.Thread):
 
     def disable_analog_reporting(self, pin):
         """
-        Disables analog reporting for a single analog pin.
+        Disables analog reporting for a single input analog pin.
 
-        :param pin: Analog pin number. For example for A0, the number is 0.
+        :param pin: Analog pin number. For example for A0, the pin is
+                    0. The "A" prefix is dropped.
 
         """
         command = [PrivateConstants.MODIFY_REPORTING,
@@ -330,9 +364,8 @@ class TmxNano2040Wifi(threading.Thread):
         """
         Enables analog reporting for the specified pin.
 
-        :param pin: Analog pin number. For example for A0, the number is 0.
-
-
+        :param pin: Analog pin number. For example for A0, the pin is
+                    0. The "A" prefix is dropped.
         """
         command = [PrivateConstants.MODIFY_REPORTING,
                    PrivateConstants.REPORTING_ANALOG_ENABLE, pin]
@@ -351,7 +384,9 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _get_arduino_id(self):
         """
-        Retrieve arduino-telemetrix arduino id
+        This is a private utility method.
+
+        Retrieve the id within the server sketch.
 
         """
         command = [PrivateConstants.ARE_U_THERE]
@@ -361,8 +396,10 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _get_firmware_version(self):
         """
-        This method retrieves the
-        arduino-telemetrix firmware version
+        This is a private utility method.
+
+        This method retrieves the firmware version
+        from the server sketch.
 
         """
         command = [PrivateConstants.GET_FIRMWARE_VERSION]
@@ -376,6 +413,10 @@ class TmxNano2040Wifi(threading.Thread):
         Read the specified number of bytes from the specified register for
         the i2c device.
 
+        Note: before using this method, you must initialize i2c by
+        calling set_pin_mode_i2c. Calling set_pin_mode_i2c is called once
+        within your application.
+
 
         :param address: i2c device address
 
@@ -384,7 +425,7 @@ class TmxNano2040Wifi(threading.Thread):
         :param number_of_bytes: number of bytes to be read
 
         :param callback: Required callback function to report i2c data as a
-                   result of read command
+                   result of a read command
 
 
         callback returns a data list:
@@ -402,6 +443,10 @@ class TmxNano2040Wifi(threading.Thread):
         Read the specified number of bytes from the specified register for
         the i2c device. This restarts the transmission after the read. It is
         required for some i2c devices such as the MMA8452Q accelerometer.
+
+        Note: before using this method, you must initialize i2c by
+        calling set_pin_mode_i2c. Calling set_pin_mode_i2c is called once
+        within your application.
 
 
         :param address: i2c device address
@@ -428,6 +473,9 @@ class TmxNano2040Wifi(threading.Thread):
     def _i2c_read_request(self, address, register, number_of_bytes,
                           stop_transmission=True, callback=None):
         """
+        This is a private utility method.
+
+
         This method requests the read of an i2c device. Results are retrieved
         via callback.
 
@@ -468,6 +516,10 @@ class TmxNano2040Wifi(threading.Thread):
         """
         Write data to an i2c device.
 
+        Note: before using this method, you must initialize i2c by
+        calling set_pin_mode_i2c. Calling set_pin_mode_i2c is called once
+        within your application.
+
         :param address: i2c device address
 
         :param args: A variable number of bytes to be sent to the device
@@ -491,7 +543,8 @@ class TmxNano2040Wifi(threading.Thread):
     def loop_back(self, start_character, callback=None):
         """
         This is a debugging method to send a character to the
-        Arduino device, and have the device loop it back.
+        Arduino device, and have the device loop it back and report it
+        on the console.
 
         :param start_character: The character to loop back. It should be
                                 an integer.
@@ -508,6 +561,10 @@ class TmxNano2040Wifi(threading.Thread):
         Set the selected pixel in the pixel array on the Pico to
         the value provided.
 
+        Note: before using this method, you must initialize the neopixel
+        interface by calling set_pin_mode_neopixel. Calling
+        set_pin_mode_neopixel is called once within your application.
+
         :param pixel_number: pixel number
 
         :param r: red value 0-255
@@ -516,7 +573,9 @@ class TmxNano2040Wifi(threading.Thread):
 
         :param b: blue value 0-255
 
-        :param auto_show: call show automatically
+        :param auto_show: call show automatically. If True, then
+                          the visible changes are enacted immediately by
+                          automatically calling neo_pixel_show.
 
         """
         if not self.neopixels_initiated:
@@ -542,9 +601,11 @@ class TmxNano2040Wifi(threading.Thread):
 
     def neopixel_clear(self, auto_show=True):
         """
-        Clear all pixels
+        Clear all pixels.
 
-        :param auto_show: call show automatically
+        :param auto_show: True or False. If True, then
+                          the visible changes are enacted immediately by
+                          automatically calling neo_pixel_show.
 
         """
         if not self.neopixels_initiated:
@@ -558,7 +619,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     def neopixel_fill(self, r=0, g=0, b=0, auto_show=True):
         """
-        Fill all pixels with specified value
+        Fill all pixels with specified color value.
 
         :param r: 0-255
 
@@ -566,7 +627,9 @@ class TmxNano2040Wifi(threading.Thread):
 
         :param b: 0-255
 
-        :param auto_show: call show automatically
+        :param auto_show: True of False. If True, then
+                          the visible changes are enacted immediately by
+                          automatically calling neo_pixel_show.
         """
         if not self.neopixels_initiated:
             if self.shutdown_on_exception:
@@ -584,7 +647,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     def neopixel_show(self):
         """
-        Write the NeoPixel buffer stored in the Pico to the NeoPixel strip.
+        Write the NeoPixel buffer stored on the server to the NeoPixel device.
 
         """
         if not self.neopixels_initiated:
@@ -596,7 +659,8 @@ class TmxNano2040Wifi(threading.Thread):
 
     def set_analog_scan_interval(self, interval):
         """
-        Set the analog scanning interval.
+        Set the analog scanning interval on the server. The default
+        is 19 milliseconds.
 
         :param interval: value of 0 - 255 - milliseconds
         """
@@ -624,14 +688,16 @@ class TmxNano2040Wifi(threading.Thread):
 
     def set_pin_mode_analog_input(self, pin_number, differential=0, callback=None):
         """
-        Set a pin as an analog input.
+        Set a pin as an analog input. Changes are reported in the user supplied
+        callback method.
 
         :param pin_number: arduino pin number
 
         :param differential: difference in previous to current value before
-                             report will be generated
+                             report will be generated.
 
-        :param callback: callback function
+        :param callback: callback function.  This parameter is
+                         required to be supplied.
 
 
         callback returns a data list:
@@ -648,13 +714,49 @@ class TmxNano2040Wifi(threading.Thread):
         self._set_pin_mode(pin_number, PrivateConstants.AT_ANALOG, differential,
                            callback)
 
+    def set_pin_mode_dht(self, pin, callback=None):
+        """
+        This method establishes the DHT data pin. A maximum number of
+        2 DHT devices is supported.
+
+        :param pin: DHT data pin.
+
+        :param callback: callback function. This parameter is
+                         required to be supplied.
+
+        Error Callback: [DHT REPORT Type, DHT_ERROR_NUMBER, PIN, Time]
+
+        Valid Data Callback: DHT REPORT Type, DHT_DATA=, PIN, Humidity,
+                             Temperature, Time]
+
+        """
+
+        if not callback:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError('set_pin_mode_dht: A Callback must be specified')
+
+        if self.dht_count < PrivateConstants.MAX_DHTS:
+            self.dht_callbacks[pin] = callback
+            self.dht_count += 1
+
+            command = [PrivateConstants.DHT_NEW, pin]
+            self._send_command(command)
+        else:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError(
+                f'Maximum Number Of DHTs Exceeded - set_pin_mode_dht fails for pin {pin}')
+
     def set_pin_mode_digital_input(self, pin_number, callback=None):
         """
-        Set a pin as a digital input.
+        Set a pin as a digital input. Changes are reported via the user
+        supplied callback method.
 
         :param pin_number: arduino pin number
 
-        :param callback: callback function
+        :param callback: callback function. This parameter is
+                         required to be supplied.
 
 
         callback returns a data list:
@@ -676,7 +778,8 @@ class TmxNano2040Wifi(threading.Thread):
 
         :param pin_number: arduino pin number
 
-        :param callback: callback function
+        :param callback: callback function. This parameter is
+                         required to be supplied.
 
 
         callback returns a data list:
@@ -725,8 +828,9 @@ class TmxNano2040Wifi(threading.Thread):
     def set_pin_mode_imu(self, callback=None,
                          enable=True):
         """
+        This methods enables or disables the on-board IMU unit.
 
-        :param callback: callback function
+        :param callback: callback function. This is a required parameter.
 
         :param enable: True: start monitoring, False: stop monitoring
 
@@ -748,7 +852,9 @@ class TmxNano2040Wifi(threading.Thread):
                                 mic_type=PrivateConstants.MICROPHONE_MONO,
                                 frequency=16000):
         """
-        :param callback: callback function
+        This method enables or disables the on-board microphone.
+
+        :param callback: callback function. This is a required parameter.
 
         :param enable: True: start monitoring, False: stop monitoring
 
@@ -777,10 +883,10 @@ class TmxNano2040Wifi(threading.Thread):
                    freq_lsb]
         self._send_command(command)
 
-    def set_pin_mode_neopixel(self, pin_number=28, num_pixels=8,
+    def set_pin_mode_neopixel(self, pin_number=12, num_pixels=8,
                               fill_r=0, fill_g=0, fill_b=0):
         """
-        Initialize the pico for NeoPixel control. Fill with rgb values specified.
+        Initialize a pin for NeoPixel control. Fill with rgb values specified.
 
         Default: Set all the pixels to off.
 
@@ -827,13 +933,13 @@ class TmxNano2040Wifi(threading.Thread):
     def set_pin_mode_servo(self, pin_number, min_pulse=544, max_pulse=2400):
         """
 
-        Attach a pin to a servo motor
+        Attach a pin to a servo motor.
 
         :param pin_number: pin
 
-        :param min_pulse: minimum pulse width
+        :param min_pulse: minimum pulse width in microseconds.
 
-        :param max_pulse: maximum pulse width
+        :param max_pulse: maximum pulse width in microseconds.
 
         """
         if pin_number not in self.digital_output_pins:
@@ -850,6 +956,8 @@ class TmxNano2040Wifi(threading.Thread):
     def set_pin_mode_sonar(self, trigger_pin, echo_pin,
                            callback=None):
         """
+        Set both a trigger pin and an echo pin to monitor an HC-SR04 type device.
+        A maximum of 6 sonar devices is supported.
 
         :param trigger_pin:
 
@@ -891,6 +999,45 @@ class TmxNano2040Wifi(threading.Thread):
             raise RuntimeError(
                 f'Maximum Number Of Sonars Exceeded - set_pin_mode_sonar fails for pin {trigger_pin}')
 
+    def set_pin_mode_spi(self, chip_select_list=None):
+        """
+        Enable the SPI pins. A list of all chip select pins to
+        be used must be specified here.
+
+        The pins to use are fixed at:
+        miso - D11
+        mosi - D12
+        clock -D13
+
+        Chip select pins may be any GPIO(except for A4 - A7) and D11, D12 and D13
+
+        :param chip_select_list: this is a LIST of pins to be used for chip select.
+                           The pins will be configured as output, and set to high
+                           ready to be used for chip select.
+                           NOTE: You must specify the chips select pins here!
+
+
+        command message: [command, number of cs pins, [cs pins...]]
+        """
+
+        if type(chip_select_list) != list:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError('chip_select_list must be in the form of a list')
+        if not chip_select_list:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError('Chip select pins were not specified')
+
+        self.spi_enabled = True
+
+        command = [PrivateConstants.SPI_INIT, len(chip_select_list)]
+
+        for pin in chip_select_list:
+            command.append(pin)
+            self.cs_pins_enabled.append(pin)
+        self._send_command(command)
+
     def servo_write(self, pin_number, angle):
         """
 
@@ -906,12 +1053,130 @@ class TmxNano2040Wifi(threading.Thread):
 
     def servo_detach(self, pin_number):
         """
-        Detach a servo for reuse
+        Detach a servo.
 
         :param pin_number: attached pin
 
         """
         command = [PrivateConstants.SERVO_DETACH, pin_number]
+        self._send_command(command)
+
+    def spi_cs_control(self, chip_select_pin, select):
+        """
+        Control an SPI chip select line
+        :param chip_select_pin: pin connected to CS
+
+        :param select: 0=select, 1=deselect
+        """
+        if not self.spi_enabled:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError(f'spi_cs_control: SPI interface is not enabled.')
+
+        if chip_select_pin not in self.cs_pins_enabled:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError(f'spi_cs_control: chip select pin never enabled.')
+        command = [PrivateConstants.SPI_CS_CONTROL, chip_select_pin, select]
+        self._send_command(command)
+
+    def spi_read_blocking(self, register_selection, number_of_bytes_to_read,
+                          call_back=None):
+        """
+        Read the specified number of bytes from the SPI port and
+        call the callback function with the reported data.
+
+        :param register_selection: Register to be selected for read.
+
+        :param number_of_bytes_to_read: Number of bytes to read
+
+        :param call_back: Required callback function to report spi data as a
+                   result of read command
+
+
+        callback returns a data list:
+        [SPI_READ_REPORT, count of data bytes read, data bytes, time-stamp]
+
+        SPI_READ_REPORT = 13
+
+        """
+
+        if not self.spi_enabled:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError(f'spi_read_blocking: SPI interface is not enabled.')
+
+        if not call_back:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError('spi_read_blocking: A Callback must be specified')
+
+        self.spi_callback = call_back
+
+        command = [PrivateConstants.SPI_READ_BLOCKING, number_of_bytes_to_read,
+                   register_selection]
+
+        self._send_command(command)
+
+    def spi_set_format(self, clock_divisor, bit_order, data_mode):
+        """
+        Configure how the SPI serializes and de-serializes data on the wire.
+
+        See Arduino SPI reference materials for details.
+
+        :param clock_divisor:
+
+        :param bit_order:
+
+                            LSBFIRST = 0
+
+                            MSBFIRST = 1 (default)
+
+        :param data_mode:
+
+                            SPI_MODE0 = 0x00 (default)
+
+                            SPI_MODE1  = 0x04
+
+                            SPI_MODE2 = 0x08
+
+                            SPI_MODE3 = 0x0C
+
+        """
+
+        if not self.spi_enabled:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError(f'spi_set_format: SPI interface is not enabled.')
+
+        command = [PrivateConstants.SPI_SET_FORMAT, clock_divisor, bit_order,
+                   data_mode]
+        self._send_command(command)
+
+    def spi_write_blocking(self, bytes_to_write):
+        """
+        Write a list of bytes to the SPI device.
+
+        :param bytes_to_write: A list of bytes to write. This must
+                                be in the form of a list.
+
+        """
+
+        if not self.spi_enabled:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError(f'spi_write_blocking: SPI interface is not enabled.')
+
+        if type(bytes_to_write) is not list:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError('spi_write_blocking: bytes_to_write must be a list.')
+
+        command = [PrivateConstants.SPI_WRITE_BLOCKING, len(bytes_to_write)]
+
+        for data in bytes_to_write:
+            command.append(data)
+
         self._send_command(command)
 
     def _set_pin_mode(self, pin_number, pin_state, differential=0, callback=None):
@@ -971,28 +1236,22 @@ class TmxNano2040Wifi(threading.Thread):
 
     def shutdown(self):
         """
-        This method attempts an orderly shutdown
+        This method attempts to perform an orderly shutdown.
         If any exceptions are thrown, they are ignored.
         """
         self.shutdown_flag = True
 
         self._stop_threads()
 
-        if self.imu_enabled:
-            self.set_pin_mode_imu(enable=False)
-            time.sleep(.2)
-            # let data drain
-        if self.mic_enabled:
-            self.set_pin_mode_microphone(enable=False)
-            time.sleep(.2)
         try:
             command = [PrivateConstants.STOP_ALL_REPORTS]
             self._send_command(command)
-            time.sleep(.5)
+            time.sleep(.1)
 
-            command = [PrivateConstants.RESET]
+            command = [PrivateConstants.RESET, self.reset_board_on_shutdown]
             self._send_command(command)
 
+            time.sleep(1)
             try:
                 self.sock.shutdown(socket.SHUT_RDWR)
                 self.sock.close()
@@ -1023,39 +1282,6 @@ class TmxNano2040Wifi(threading.Thread):
             message = [PrivateConstants.ANALOG_REPORT, pin, value, time_stamp]
             self.analog_callbacks[pin](message)
 
-    def _dht_report(self, data):
-        """
-        This is the dht report handler method.
-
-        :param data:            data[0] = report error return
-                                    No Errors = 0
-
-                                    Checksum Error = 1
-
-                                    Timeout Error = 2
-
-                                    Invalid Value = 999
-
-                                data[1] = pin number
-
-                                data[2] = dht type 11 or 22
-
-                                data[3] = humidity positivity flag
-
-                                data[4] = temperature positivity value
-
-                                data[5] = humidity integer
-
-                                data[6] = humidity fractional value
-
-                                data[7] = temperature integer
-
-                                data[8] = temperature fractional value
-
-
-        """
-        pass
-
     def _digital_message(self, data):
         """
         This is a private message handler method.
@@ -1074,6 +1300,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _firmware_message(self, data):
         """
+        This is a private message handler method.
         Telemetrix4Arduino firmware version message
 
         :param data: data[0] = major number, data[1] = minor number.
@@ -1085,6 +1312,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _i2c_read_report(self, data):
         """
+        This is a private message handler method.
         Execute callback for i2c reads.
 
         :param data: [I2C_READ_REPORT, number of bytes read, address, register,
@@ -1107,6 +1335,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _i2c_too_few(self, data):
         """
+        This is a private message handler method.
         I2c reports too few bytes received
 
         :param data: data[0] = device address
@@ -1118,6 +1347,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _i2c_too_many(self, data):
         """
+        This is a private message handler method.
         I2c reports too few bytes received
 
         :param data: data[0] = device address
@@ -1129,10 +1359,24 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _i_am_here(self, data):
         """
+        This is a private message handler method.
         Reply to are_u_there message
         :param data: arduino id
         """
         self.reported_arduino_id = data[0]
+
+    def _spi_report(self, report):
+        """
+        This is a private message handler method.
+
+        :param report: [count of data bytes read, data bytes...]
+        """
+
+        cb_list = [PrivateConstants.SPI_REPORT, report[0]] + report[1:]
+
+        cb_list.append(time.time())
+
+        self.spi_callback(cb_list)
 
     def _report_debug_data(self, data):
         """
@@ -1157,7 +1401,6 @@ class TmxNano2040Wifi(threading.Thread):
         """
         This is a private utility method.
 
-
         :param command:  command data in the form of a list
 
         """
@@ -1170,6 +1413,8 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _servo_unavailable(self, report):
         """
+        This is a private utility method.
+
         Message if no servos are available for use.
         :param report: pin number
         """
@@ -1180,6 +1425,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _sonar_distance_report(self, report):
         """
+        This is a private utility method.
 
         :param report: data[0] = trigger pin, data[1] and data[2] = distance
 
@@ -1200,6 +1446,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _imu_report(self, report):
         """
+        This is a private utility method.
 
         :param report: ax, ay, az, gx, gy, gz expressed as integer and fractional
                        values, followed by a positivity flag
@@ -1238,14 +1485,17 @@ class TmxNano2040Wifi(threading.Thread):
         if report[17]:
             gz = gz * -1.0
 
+        time_stamp = time.time()
+
         # build report data
         cb_list = [PrivateConstants.IMU_REPORT, ax, ay, az,
-                   gx, gy, gz]
+                   gx, gy, gz, time_stamp]
 
         cb(cb_list)
 
     def _microphone_report(self, report):
         """
+        This is a private utility method.
 
         :param report: [audio_level_msb, audio_level_lsb]
         """
@@ -1255,8 +1505,9 @@ class TmxNano2040Wifi(threading.Thread):
             value = report[0], report[1]
             value = bytes(value)
             value = struct.unpack(">h", value)
+            time_stamp = time.time()
             cb_list = [PrivateConstants.MICROPHONE_REPORT, value[0],
-                       self.mic_current_channel]
+                       self.mic_current_channel, time_stamp]
             if self.mic_type == PrivateConstants.AT_MICROPHONE_STEREO:
                 if self.mic_current_channel == 'l':
                     self.mic_current_channel = 'r'
@@ -1264,17 +1515,92 @@ class TmxNano2040Wifi(threading.Thread):
                     self.mic_current_channel = 'l'
             cb(cb_list)
 
+    def _dht_report(self, report):
+        """
+        This is a private utility method.
+
+        This is the dht report handler method.
+
+        :param report:
+               data[0] = report error return
+                                No Errors = 0
+
+                                Checksum Error = 1
+
+                                Timeout Error = 2
+
+                                Invalid Value = 999
+
+               data[1] = pin number
+
+               data[2] = humidity positivity flag
+
+               data[3] = temperature positivity value
+
+               data[4] = humidity integer
+
+               data[5] = humidity fractional value
+
+               data[6] = temperature integer
+
+               data[7] = temperature fractional value
+
+
+                """
+        if report[0]:  # DHT_ERROR
+            # error report
+            # data[0] = report sub type, data[1] = pin, data[2] = error message
+            if self.dht_callbacks[report[1]]:
+                # Callback 0=DHT REPORT, DHT_ERROR, PIN, Time
+                message = [PrivateConstants.DHT_REPORT, report[0], report[1], report[2],
+                           time.time()]
+                self.dht_callbacks[report[1]](message)
+        else:
+            # got valid data DHT_DATA
+            f_humidity = float(report[4] + report[5] / 100)
+            if report[2]:
+                f_humidity *= -1.0
+            f_temperature = float(report[6] + report[7] / 100)
+            if report[3]:
+                f_temperature *= -1.0
+            message = [PrivateConstants.DHT_REPORT, report[0], report[1], report[2],
+                       f_humidity, f_temperature, time.time()]
+
+            self.dht_callbacks[report[1]](message)
+
     def _run_threads(self):
+        """
+        This is a private utility method.
+
+        Set the thread event to indicate threads are enabled.
+
+        """
         self.run_event.set()
 
     def _is_running(self):
+        """
+        This is a private utility method.
+
+        Report if threads are currently running.
+
+        :return: True or False.
+        """
         return self.run_event.is_set()
 
     def _stop_threads(self):
+        """
+
+        This is a private utility method.
+
+        Set the thread event to indicate threads are stopped.
+
+        """
         self.run_event.clear()
 
     def _reporter(self):
         """
+        This is a private utility method.
+
         This is the reporter thread. It continuously pulls data from
         the deque. When a full message is detected, that message is
         processed.
@@ -1299,7 +1625,8 @@ class TmxNano2040Wifi(threading.Thread):
                     # get the report type and look up its dispatch method
                     # here we pop the report type off of response_data
                     report_type = response_data.pop(0)
-                    # print(report_type)
+
+                    print(f'report type: {report_type}')
 
                     # retrieve the report handler from the dispatch table
                     # retrieve the report handler from the dispatch table
@@ -1308,8 +1635,8 @@ class TmxNano2040Wifi(threading.Thread):
                     # if there is additional data for the report,
                     # it will be contained in response_data
                     # noinspection PyArgumentList
-                    dispatch_entry(response_data)
 
+                    dispatch_entry(response_data)
                     continue
                 else:
                     if self.shutdown_on_exception:
@@ -1321,6 +1648,8 @@ class TmxNano2040Wifi(threading.Thread):
 
     def _tcp_receiver(self):
         """
+        This is a private utility method.
+
         Thread to continuously check for incoming data.
         When a byte comes in, place it onto the deque.
         """
