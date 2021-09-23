@@ -48,3 +48,6 @@ for pin in range(LED_G, LED_R+1):
         except KeyboardInterrupt:
             board.shutdown()
             sys.exit(0)
+
+board.shutdown()
+sys.exit(0)

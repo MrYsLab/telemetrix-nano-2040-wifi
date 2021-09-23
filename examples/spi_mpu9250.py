@@ -131,7 +131,7 @@ read_data_from_device(0x75, 1, the_device_callback)
 
 while True:
     try:
-        time.sleep(1)
+        time.sleep(.1)
         # get the acceleration values
         read_data_from_device(0x3b, 6, accel_callback)
         time.sleep(.1)
