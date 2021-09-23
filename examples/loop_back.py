@@ -46,7 +46,7 @@ def loop_back(my_board, loop_back_data):
         for data in loop_back_data:
             my_board.loop_back(data, callback=the_callback)
             print(f'Sending: {data}')
-        time.sleep(2)
+        time.sleep(.2)
     except KeyboardInterrupt:
         board.shutdown()
         sys.exit(0)
@@ -56,7 +56,7 @@ board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
 char_list = ['A', 'B', 'Z']
 try:
     loop_back(board, char_list)
-    time.sleep(1)
+    time.sleep(.2)
     board.shutdown()
     sys.exit(0)
 except KeyboardInterrupt:
