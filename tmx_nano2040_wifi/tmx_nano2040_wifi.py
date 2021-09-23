@@ -44,7 +44,7 @@ class TmxNano2040Wifi(threading.Thread):
     """
 
     # noinspection PyPep8,PyPep8,PyPep8
-    def __init__(self, arduino_wait=1,
+    def __init__(self, arduino_wait=.01,
                  sleep_tune=0.000001,
                  shutdown_on_exception=True,
                  reset_board_on_shutdown=True,
@@ -1630,9 +1630,6 @@ class TmxNano2040Wifi(threading.Thread):
                     # here we pop the report type off of response_data
                     report_type = response_data.pop(0)
 
-                    print(f'report type: {report_type}')
-
-                    # retrieve the report handler from the dispatch table
                     # retrieve the report handler from the dispatch table
                     dispatch_entry = self.report_dispatch.get(report_type)
 

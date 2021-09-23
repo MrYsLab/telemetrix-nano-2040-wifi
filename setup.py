@@ -7,20 +7,20 @@ with open('README.md') as f:
 
 
 setup(
-    name='telemetrix',
-    packages=['telemetrix'],
+    name='telemetrix-nano-2040-wifi',
+    packages=['tmx_nano2040_wifi'],
     install_requires=['pyserial'],
 
-    version='1.7',
-    description="Remotely Control And Monitor Arduino-Core devices",
+    version='1.0',
+    description="Remotely Control And Monitor An Arduino Nano RP2040 Connect",
     long_description=long_description,
     long_description_content_type='text/markdown',
 
     author='Alan Yorinks',
     author_email='MisterYsLab@gmail.com',
-    url='https://github.com/MrYsLab/telemetrix',
-    download_url='https://github.com/MrYsLab/telemetrix',
-    keywords=['telemetrix', 'Arduino', 'Protocol', 'Python'],
+    url='https://github.com/MrYsLab/telemetrix-nano-2040-wifi',
+    download_url='https://github.com/MrYsLab/telemetrix-nano-2040-wifi',
+    keywords=['telemetrix', 'RP2040' 'Arduino', 'Protocol', 'Python'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Other Environment',
@@ -29,7 +29,6 @@ setup(
         'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
 )
