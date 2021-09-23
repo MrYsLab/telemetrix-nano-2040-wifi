@@ -284,7 +284,7 @@ class TmxNano2040Wifi(threading.Thread):
         try:
             self.sock.settimeout(8)
             self.sock.connect((self.ip_address, self.ip_port))
-        except socket.timeout:
+        except (socket.timeout, OSError):
             print(f'Could not establish a connection to {self.ip_address}:{self.ip_port}')
             try:
                 self.sock.shutdown(socket.SHUT_RDWR)
