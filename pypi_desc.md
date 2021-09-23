@@ -7,7 +7,7 @@ an Arduino Nano RP2040 Connect using Python scripts running on your PC.
 
 When paired with the [Telemetrix4Connect2040](https://github.com/MrYsLab/Telemetrix4Connect2040)
 custom Arduino server sketch, control and
-monitoring of the Arduino Nano RP2040 Connect is accomplished used a Wi-Fi link 
+monitoring of the Arduino Nano RP2040 Connect is accomplished using a Wi-Fi link 
 between the
 PC and the Arduino.
 
