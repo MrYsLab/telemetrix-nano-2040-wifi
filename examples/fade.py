@@ -48,8 +48,8 @@ try:
     for i in range(255, -1, -1):
         board.analog_write(DIGITAL_PIN, i)
         time.sleep(.005)
-
-
+    board.shutdown()
+    sys.exit(0)
 except KeyboardInterrupt:
     board.shutdown()
     sys.exit(0)
