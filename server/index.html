@@ -1,0 +1,1000 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.3.0">
+    
+    
+      
+        <title>Installing The Server Software - Telemetrix For The Arduino Nano RP2040 Connect</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.8b42a75e.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#telemetrix4connect2040-installation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Telemetrix For The Arduino Nano RP2040 Connect" class="md-header__button md-logo" aria-label="Telemetrix For The Arduino Nano RP2040 Connect" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Telemetrix For The Arduino Nano RP2040 Connect
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Installing The Server Software
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Telemetrix For The Arduino Nano RP2040 Connect" class="md-nav__button md-logo" aria-label="Telemetrix For The Arduino Nano RP2040 Connect" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    Telemetrix For The Arduino Nano RP2040 Connect
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          System Requiements
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="System Requiements" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          System Requiements
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../python3/" class="md-nav__link">
+        Python 3
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../arduino_ide/" class="md-nav__link">
+        Arduino IDE
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install_telemetrix/" class="md-nav__link">
+        Installing The Client Software
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Installing The Server Software
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Installing The Server Software
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#adding-the-server-to-the-arduino-ide" class="md-nav__link">
+    Adding The Server To The Arduino IDE
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-telemetrix4connect2040-into-the-ide-editor" class="md-nav__link">
+    Install Telemetrix4Connect2040 Into The IDE Editor
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edit-the-sketch-to-contain-your-network-ssid-and-password" class="md-nav__link">
+    Edit The Sketch To Contain Your Network SSID And Password
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-the-telemetrix4arduino-instance-id" class="md-nav__link">
+    Setting The Telemetrix4Arduino Instance ID
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting The Telemetrix4Arduino Instance ID">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#matching-the-id-in-your-application" class="md-nav__link">
+    Matching The ID In Your Application
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compile-and-upload-the-server-to-the-arduino-nano-connect" class="md-nav__link">
+    Compile And Upload The Server To The Arduino Nano Connect
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-rgb-led-status-and-obtaining-the-ip-address-assigned-to-the-arduino-nano" class="md-nav__link">
+    The RGB LED Status And Obtaining The IP Address Assigned To The Arduino Nano
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-the-loop_back-example" class="md-nav__link">
+    Run The Loop_Back Example
+  </a>
+  
+    <nav class="md-nav" aria-label="Run The Loop_Back Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-telemetrix-nano-2040-wifi" class="md-nav__link">
+    For Telemetrix-Nano-2040-WiFi
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-tmx-nano2040-wifi-aio" class="md-nav__link">
+    For Tmx-Nano2040-WiFi-AIO
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Usage
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Usage" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Usage
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        The APIs And The Examples
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pins/" class="md-nav__link">
+        Specifying Pin Modes And Pin Numbers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../callback/" class="md-nav__link">
+        Understanding Callbacks
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../about/" class="md-nav__link">
+        Reporting Issues
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#adding-the-server-to-the-arduino-ide" class="md-nav__link">
+    Adding The Server To The Arduino IDE
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-telemetrix4connect2040-into-the-ide-editor" class="md-nav__link">
+    Install Telemetrix4Connect2040 Into The IDE Editor
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edit-the-sketch-to-contain-your-network-ssid-and-password" class="md-nav__link">
+    Edit The Sketch To Contain Your Network SSID And Password
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-the-telemetrix4arduino-instance-id" class="md-nav__link">
+    Setting The Telemetrix4Arduino Instance ID
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting The Telemetrix4Arduino Instance ID">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#matching-the-id-in-your-application" class="md-nav__link">
+    Matching The ID In Your Application
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compile-and-upload-the-server-to-the-arduino-nano-connect" class="md-nav__link">
+    Compile And Upload The Server To The Arduino Nano Connect
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-rgb-led-status-and-obtaining-the-ip-address-assigned-to-the-arduino-nano" class="md-nav__link">
+    The RGB LED Status And Obtaining The IP Address Assigned To The Arduino Nano
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-the-loop_back-example" class="md-nav__link">
+    Run The Loop_Back Example
+  </a>
+  
+    <nav class="md-nav" aria-label="Run The Loop_Back Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-telemetrix-nano-2040-wifi" class="md-nav__link">
+    For Telemetrix-Nano-2040-WiFi
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-tmx-nano2040-wifi-aio" class="md-nav__link">
+    For Tmx-Nano2040-WiFi-AIO
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="telemetrix4connect2040-installation"><a href="https://github.com/MrYsLab/Telemetrix4Connect2040">Telemetrix4Connect2040</a> Installation</h1>
+<p>To install the server, we will need to:</p>
+<ul>
+<li>Install the server library into the Arduino IDE.</li>
+<li>Modify the server sketch to contain the SSID and Password of your network.</li>
+<li>Optionally modify the ID value of the server.</li>
+<li>Upload the modified sketch to the Arduino Nano RP2040 Connect.</li>
+<li>Understand the RGB LED Indications.</li>
+<li>Retrieve the IP address assigned to the Arduino Nano RP2040 Connect.</li>
+<li>Run the loop_back example to assure that the installation was successful.</li>
+</ul>
+<h2 id="adding-the-server-to-the-arduino-ide">Adding The Server To The Arduino IDE</h2>
+<p>Open the Arduino IDE and select Tools/Manage Libraries.</p>
+<p><img alt="" src="../images/manage_libraries.png" /></p>
+<p>Enter "Telemetrix4Connect2040 in the search box.</p>
+<p><img alt="" src="../images/telemetrix4nanoconnect.png" /></p>
+<p>Click on the Install button. You will be prompted to allow the installation
+of additional libraries. Accept the installation for all.</p>
+<h2 id="install-telemetrix4connect2040-into-the-ide-editor">Install Telemetrix4Connect2040 Into The IDE Editor</h2>
+<p>From the <em>main menu</em> of the IDE, select:</p>
+<p>File/Examples/Telemetrix4Connect2040/Telemetrix4Connect2040.</p>
+<p><img alt="" src="../images/install_t4a.png" /></p>
+<p>The sketch should now be available in the editor.</p>
+<h2 id="edit-the-sketch-to-contain-your-network-ssid-and-password">Edit The Sketch To Contain Your Network SSID And Password</h2>
+<p><img alt="" src="../images/ssid.png" /></p>
+<p>Using the IDE editor, locate the comment line that contains:</p>
+<pre><code class="language-python">// Modify the next two lines to match your network values
+</code></pre>
+<p>Replace YOUR_SSID and PASSWORD with the actual values for your network. 
+Make sure that you retain the quotation marks.</p>
+<p>Save the sketch. You may be asked to rename it. This will retain the original
+version, and the renamed version will contain your changes.</p>
+<h2 id="setting-the-telemetrix4arduino-instance-id">Setting The Telemetrix4Arduino Instance ID</h2>
+<p>Telemetrix4Connect2040, in conjunction with the project clients, associates a 
+specific Arduino board with your application.</p>
+<p>If you only have a single Arduino connected at a time, you do not need to do anything. </p>
+<p>However,
+if you wish to run multiple Arduino's, you must assign a unique ID number to each
+Arduino. The ID number is then supplied as an input parameter when your application
+ is instantiated.</p>
+<p><img alt="" src="../images/add_zip3.png" /></p>
+<p>Save your changes.</p>
+<h3 id="matching-the-id-in-your-application">Matching The ID In Your Application</h3>
+<p>Your application must use the same ID set in the server. If you did not
+change the instance id, then your application can accept the default value. However, if 
+you did 
+change it, you must set the 
+instance id when 
+instantiating the client class.</p>
+<pre><code class="language-python">    def __init__(self, arduino_wait=.01,
+                 instance_id=1,
+                 sleep_tune=0.000001,
+                 shutdown_on_exception=True,
+                 reset_board_on_shutdown=True,
+                 ip_address=None, ip_port=31335):
+
+        &quot;&quot;&quot;
+        In general, you may accept all of the default parameter values.
+
+        :param arduino_wait: wait time for Arduino to reset itself.
+                             The time is specified in seconds. Increase
+                             this value if your application does not
+                             locate the Nano Connect.
+
+        :param instance_id: value must match the value set in the server. It
+                            is used to identify the connected Arduino.
+
+        :param sleep_tune: A tuning parameter (typically not changed
+                           the by user)
+
+        :param shutdown_on_exception: call shutdown before raising
+                                      a RunTimeError exception, or
+                                      receiving a KeyboardInterrupt exception.
+                                      Set this to False if you wish to handle
+                                      exceptions and not shut down the application.
+
+        :param reset_board_on_shutdown: if True, a hardware reset  of the board is
+                                        performed when the shutdown method is called.
+                                        If set to False, restarting your program may
+                                        not work as expected since onboard
+                                        devices may no longer respond. Resetting the
+                                        board solves this issue.
+
+        :param ip_address: ip address of tcp/ip connected device.
+                           This parameter is required to be supplied.
+
+        :param ip_port: ip port of tcp/ip connected device. In general
+                        you do not need to alter the default value.
+        &quot;&quot;&quot;
+</code></pre>
+<h2 id="compile-and-upload-the-server-to-the-arduino-nano-connect">Compile And Upload The Server To The Arduino Nano Connect</h2>
+<p>Press the upload arrow on the IDE.</p>
+<p><img alt="" src="../images/upload.png" /></p>
+<h2 id="the-rgb-led-status-and-obtaining-the-ip-address-assigned-to-the-arduino-nano">The RGB LED Status And Obtaining The IP Address Assigned To The Arduino Nano</h2>
+<p>After the upload completes, within a few moments, the RGB LED should glow green.
+This indicates that there was a successful handshake between the Arduino and the network.</p>
+<p>If the RGB is red, check that you modified the server sketch correctly for the network 
+SSID 
+and 
+Password.</p>
+<p>If the RGB LED is green, enable the Arduino serial monitor, and repower the Arduino.
+The serial monitor will indicate the IP address assigned to the Arduino Nano RP2040 Core.</p>
+<p><img alt="" src="../images/ip_address.png" /></p>
+<p>Make a note of this address. It needs to be specified when instantiating a client class 
+in your application.</p>
+<pre><code class="language-python"># Create a Telemetrix instance.
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
+</code></pre>
+<h2 id="run-the-loop_back-example">Run The Loop_Back Example</h2>
+<h3 id="for-telemetrix-nano-2040-wifi">For Telemetrix-Nano-2040-WiFi</h3>
+<p>Copy the following example and run it using Python3.</p>
+<pre><code class="language-python">&quot;&quot;&quot;
+ Copyright (c) 2021 Alan Yorinks All rights reserved.
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
+ Version 3 as published by the Free Software Foundation; either
+ or (at your option) any later version.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+
+ You should have received a copy of the GNU AFFERO GENERAL PUBLIC LICENSE
+ along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+&quot;&quot;&quot;
+
+import time
+import sys
+from tmx_nano2040_wifi import tmx_nano2040_wifi
+
+&quot;&quot;&quot;
+Loopback some data to assure that data can be sent and received between
+the Telemetrix client and Telemetrix server.
+&quot;&quot;&quot;
+
+
+def the_callback(data):
+    &quot;&quot;&quot;
+    A callback function to report the looped back data
+
+    :param data: [looped back data]
+    &quot;&quot;&quot;
+    print(f'Looped back: {chr(data[0])}')
+
+
+def loop_back(my_board, loop_back_data):
+    &quot;&quot;&quot;
+    This function will request that the supplied characters be
+    sent to the board and looped back and printed out to the console.
+
+    :param my_board: a tmx_nano2040_wifi instance
+    :param loop_back_data: A list of characters to have looped back
+    &quot;&quot;&quot;
+    try:
+        for data in loop_back_data:
+            my_board.loop_back(data, callback=the_callback)
+            print(f'Sending: {data}')
+        time.sleep(.2)
+    except KeyboardInterrupt:
+        board.shutdown()
+        sys.exit(0)
+
+
+board = tmx_nano2040_wifi.TmxNano2040Wifi(ip_address='192.168.2.246')
+char_list = ['A', 'B', 'Z']
+try:
+    loop_back(board, char_list)
+    time.sleep(.2)
+    board.shutdown()
+    sys.exit(0)
+except KeyboardInterrupt:
+    board.shutdown()
+    sys.exit(0)
+
+</code></pre>
+<p>Sample output:</p>
+<pre><code class="language-python">$ python3 loop_back.py
+TmxNano2040Wifi:  Version 1.0
+
+Copyright (c) 2021 Alan Yorinks All Rights Reserved.
+
+
+Waiting 0.01 seconds(arduino_wait) for Arduino devices to reset...
+Establishing IP connection...
+Successfully connected to: 192.168.2.246:31335
+
+Retrieving Telemetrix4Connect2040 firmware ID...
+Telemetrix4Connect2040 firmware version: 1.0.0
+Sending: A
+Sending: B
+Sending: Z
+Looped back: A
+Looped back: B
+Looped back: Z
+
+</code></pre>
+<h3 id="for-tmx-nano2040-wifi-aio">For Tmx-Nano2040-WiFi-AIO</h3>
+<p>Copy the following example and run it using Python3.</p>
+<pre><code class="language-python">&quot;&quot;&quot;
+ Copyright (c) 2021 Alan Yorinks All rights reserved.
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
+ Version 3 as published by the Free Software Foundation; either
+ or (at your option) any later version.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+
+ You should have received a copy of the GNU AFFERO GENERAL PUBLIC LICENSE
+ along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+&quot;&quot;&quot;
+
+import asyncio
+import sys
+import time
+from tmx_nano2040_wifi_aio import tmx_nano2040_wifi_aio
+from tmx_nano2040_wifi_aio import telemetrix_aio_socket
+
+&quot;&quot;&quot;
+Loopback some data to assure that data can be sent and received between
+the Telemetrix client and arduino-telemetrix server.
+&quot;&quot;&quot;
+
+
+async def the_callback(data):
+    &quot;&quot;&quot;
+    A callback function to report the looped back data
+
+    :param data: [looped back data]
+    &quot;&quot;&quot;
+    print(f'Looped back: {chr(data[0])}')
+
+
+async def loop_back(my_board, loop_back_data):
+    &quot;&quot;&quot;
+    This function will request that the supplied characters be
+    sent to the board and looped back and printed out to the console.
+
+    :param my_board: a tmx_nano2040_wifi_aio instance
+    :param loop_back_data: A list of characters to have looped back
+    &quot;&quot;&quot;
+    try:
+        for data in loop_back_data:
+            await my_board.loop_back(data, callback=the_callback)
+            print(f'Sending: {data}')
+            await asyncio.sleep(.1)
+        await asyncio.sleep(.1)
+    except KeyboardInterrupt:
+        my_board.shutdown()
+        sys.exit(0)
+
+# get the event loop
+loop = asyncio.get_event_loop()
+
+# instantiate
+board = tmx_nano2040_wifi_aio.TmxNano2040WifiAio(ip_address='192.168.2.246')
+char_list = ['A', 'B', 'Z']
+try:
+    # start the main function
+    loop.run_until_complete(loop_back(board, char_list))
+    time.sleep(.1)
+    loop.run_until_complete(board.shutdown())
+
+except KeyboardInterrupt:
+    loop.run_until_complete(board.shutdown())
+    sys.exit(0)
+
+
+</code></pre>
+<p>Sample Output</p>
+<pre><code class="language-python">python3 loop_back.py
+TmxNano2040Wifi:  Version 1.0
+
+Copyright (c) 2021 Alan Yorinks All Rights Reserved.
+
+
+Waiting 0.01 seconds(arduino_wait) for Arduino devices to reset...
+Establishing IP connection...
+Successfully connected to: 192.168.2.246:31335
+
+Retrieving Telemetrix4Connect2040 firmware ID...
+Telemetrix4Connect2040 firmware version: 1.0.0
+Sending: A
+Looped back: A
+Sending: B
+Looped back: B
+Sending: Z
+Looped back: Z
+
+</code></pre>
+<p><br>
+<br>
+Copyright (C) 2021 Alan Yorinks. All Rights Reserved.</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../install_telemetrix/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Installing The Client Software" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Installing The Client Software
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../api/" class="md-footer__link md-footer__link--next" aria-label="Next: The APIs And The Examples" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              The APIs And The Examples
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        
+          Made with
+          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+            Material for MkDocs
+          </a>
+        
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.f8263e09.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.4fc53ad4.min.js"></script>
+      
+    
+  </body>
+</html>
