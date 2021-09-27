@@ -45,6 +45,7 @@ class TmxNano2040Wifi(threading.Thread):
 
     # noinspection PyPep8,PyPep8,PyPep8
     def __init__(self, arduino_wait=.01,
+                 instance_id=1,
                  sleep_tune=0.000001,
                  shutdown_on_exception=True,
                  reset_board_on_shutdown=True,
@@ -57,6 +58,9 @@ class TmxNano2040Wifi(threading.Thread):
                              The time is specified in seconds. Increase
                              this value if your application does not
                              locate the Nano Connect.
+
+        :param instance_id: value must match the value set in the server. It
+                            is used to identify the connected Arduino.
 
         :param sleep_tune: A tuning parameter (typically not changed
                            the by user)
@@ -177,6 +181,7 @@ class TmxNano2040Wifi(threading.Thread):
 
         # save input parameters as instance variables
         self.arduino_wait = arduino_wait
+        self.instance_id = instance_id
         self.sleep_tune = sleep_tune
         self.shutdown_on_exception = shutdown_on_exception
 
@@ -298,6 +303,24 @@ class TmxNano2040Wifi(threading.Thread):
         # allow the threads to run
         self._run_threads()
 
+        # get the arduino instance id
+        self._get_arduino_id()
+
+        # get telemetrix firmware version and print it
+        print('\nRetrieving Telemetrix4Connect2040 firmware ID...')
+        self._get_firmware_version()
+        if not self.firmware_version:
+            self._get_firmware_version()
+            if not self.firmware_version:
+                if self.shutdown_on_exception:
+                    self.shutdown()
+                    time.sleep(.3)
+                raise RuntimeError(f'Telemetrix4Connect2040 firmware version')
+
+        else:
+            print(f'Telemetrix4Connect2040 firmware version: {self.firmware_version[0]}.'
+                  f'{self.firmware_version[1]}.{self.firmware_version[2]}')
+
     def analog_write(self, pin, value):
         """
         Set the specified pin to the specified value.
@@ -392,6 +415,10 @@ class TmxNano2040Wifi(threading.Thread):
         self._send_command(command)
         # provide time for the reply
         time.sleep(.5)
+        if self.reported_arduino_id != self.instance_id:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError("Client and Server Instance ID's Do Not Match.")
 
     def _get_firmware_version(self):
         """
