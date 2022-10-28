@@ -1483,6 +1483,7 @@ class TmxNano2040Wifi(threading.Thread):
                        values, followed by a positivity flag
 
         """
+
         # get callback from pin number
         cb = self.imu_callback
 
@@ -1492,7 +1493,7 @@ class TmxNano2040Wifi(threading.Thread):
                 self.shutdown()
             raise RuntimeError('IMU ERROR')
 
-        ax = float(report[10] + report[1] / 100)
+        ax = float(report[0] + report[1] / 100)
         if report[2]:
             ax = ax * -1.0
 
