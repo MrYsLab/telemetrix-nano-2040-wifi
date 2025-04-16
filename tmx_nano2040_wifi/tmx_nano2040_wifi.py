@@ -123,7 +123,7 @@ class TmxNano2040Wifi(threading.Thread):
         # NeoPixel D2 - D
         # digital output pins are 0-17
         # digital input pins are 0-17, 20 and 21
-        # analog pins are a0-a7 (a4, a5, a6, a7 are in the WifiNINA chip)
+        # analog pins are a0-a3
         # RGB are pseudo pins defined in private_constants.py
 
         # A list of valid digital input pins plus the pins in the
@@ -139,7 +139,7 @@ class TmxNano2040Wifi(threading.Thread):
                                          PrivateConstants.LED_R])
 
         # A list of valid analog input pins
-        self.analog_pins = [x for x in range(8)]
+        self.analog_pins = [x for x in range(4)]
 
         # map the Digital pin number to the GPIO pin number
         self.d_to_g_pin_map = {2: 25, 3: 15, 4: 16, 5: 17, 6: 18, 7: 19,
