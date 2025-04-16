@@ -724,7 +724,7 @@ class TmxNano2040Wifi(threading.Thread):
         Set a pin as an analog input. Changes are reported in the user supplied
         callback method.
 
-        :param pin_number: arduino pin number
+        :param pin_number: arduino pin number 0-3 (A0-A3)
 
         :param differential: difference in previous to current value before
                              report will be generated.
