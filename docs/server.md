@@ -340,7 +340,3 @@ Sending: Z
 Looped back: Z
 
 ```
-
-<br>
-<br>
-Copyright (C) 2021 Alan Yorinks. All Rights Reserved.

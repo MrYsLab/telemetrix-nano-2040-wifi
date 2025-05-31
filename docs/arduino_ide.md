@@ -9,9 +9,3 @@ need to download it and install it on your PC.
 Select the version for your platform.
 
 ![](./images/arduino_ide.png)
-
-
-
-<br>
-<br>
-Copyright (C) 2021 Alan Yorinks. All Rights Reserved.

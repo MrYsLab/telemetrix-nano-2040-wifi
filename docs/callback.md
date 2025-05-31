@@ -52,8 +52,3 @@ For example:
 
 This list contains: **[pin_type, pin_number, pin_value, raw_time_stamp]**
 The pin type for this pin mode is 11.
-<br>
-<br>
-
-
-Copyright (C) 2021 Alan Yorinks. All Rights Reserved.

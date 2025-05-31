@@ -28,6 +28,3 @@ Telemetrix uses the standard I2C pins.
     (SDA) - A4
     (SCL) - A5
 
-<br>
-<br>
-Copyright (C) 2021 Alan Yorinks. All Rights Reserved.

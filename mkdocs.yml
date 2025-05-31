@@ -1,7 +1,12 @@
 site_name: Telemetrix For The Arduino Nano RP2040 Connect
+site_name: The Telemetrix User's Guide For The Raspberry Pi Pico W
+repo_url: https://github.com/MrYsLab/telemetrix-nano-2040-wifi
+copyright: > # should remain a link to the original theme
+  Copyright &copy; 2020-2025 Alan Yorinks &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  Last 
+  Modified: May 31, 2025
 nav:
     - Introduction: index.md
-    - System Requiements:
+    - System Requirements:
         - Python 3: python3.md
         - Arduino IDE: arduino_ide.md
     - Installing The Client Software: install_telemetrix.md
@@ -10,9 +15,24 @@ nav:
         - The APIs And The Examples: api.md
         - Specifying Pin Modes And Pin Numbers: pins.md
         - Understanding Callbacks: callback.md
+    - Adding New Features: extend.md
     - Reporting Issues: about.md
     - License: license.md
 # theme: windmill
 
 theme:
   name: 'material'
+
+plugins:
+  - search
+  - open-in-new-tab
+
+
+extra:
+  social:
+    - icon: fontawesome/solid/envelope
+      link: mailto:MisterYsLab@gmail.com
+    - icon: fontawesome/brands/github
+      link: https://github.com/MrYsLab
+    - icon: fontawesome/brands/bluesky
+      link: https://bsky.app/profile/mryslab.bsky.social

@@ -194,10 +194,4 @@ except (KeyboardInterrupt, RuntimeError) as e:
 
 
 
-<br>
-<br>
-
-Copyright (C) 2021 Alan Yorinks. All Rights Reserved.
-
-**Last updated 27 September 2021 **
 

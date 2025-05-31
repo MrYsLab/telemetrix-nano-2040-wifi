@@ -64,11 +64,3 @@ If you need to upgrade to the newest version from the previous version:
 ```
 sudo pip3 install tmx-nano-2040-wifi-aio-wifi --upgrade
 ```
-
-
-
-<br>
-<br>
-
-
-Copyright (C) 2021 Alan Yorinks. All Rights Reserved.
