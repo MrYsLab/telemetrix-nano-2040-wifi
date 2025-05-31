@@ -20,12 +20,12 @@ nav:
     - License: license.md
 # theme: windmill
 
-theme:
-  name: 'material'
-
 plugins:
   - search
   - open-in-new-tab
+
+theme:
+  name: 'material'
 
 
 extra:
