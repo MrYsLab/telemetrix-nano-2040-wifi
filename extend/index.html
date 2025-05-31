@@ -9,6 +9,10 @@
       
       
       
+        <link rel="prev" href="../callback/">
+      
+      
+        <link rel="next" href="../about/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -16,7 +20,7 @@
     
     
       
-        <title>Debugging Aids - The Telemetrix User's Guide For The Raspberry Pi Pico W</title>
+        <title>Adding New Features - The Telemetrix User's Guide For The Raspberry Pi Pico W</title>
       
     
     
@@ -58,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#debugging-aids" class="md-skip">
+        <a href="#adding-new-features" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Debugging Aids
+              Adding New Features
             
           </span>
         </div>
@@ -467,10 +471,19 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../extend/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -480,6 +493,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -546,23 +560,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#loopback" class="md-nav__link">
-    <span class="md-ellipsis">
-      loopback
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -580,18 +577,14 @@
   
 
 
-<h1 id="debugging-aids">Debugging Aids</h1>
-<h2 id="loopback">loopback</h2>
-<p>This loop_back API method allows you to verify that communication between the client 
-and server is functional.</p>
-<pre><code class="language-python"> def loop_back(self, start_character, callback=None)
-
-    This is a debugging method to send a character to the Arduino device, and have the device loop it back.
-
-    :param start_character: The character to loop back. It should be an integer.
-
-    :param callback: Looped back character will appear in the callback method
-</code></pre>
+<h1 id="adding-new-features">Adding New Features</h1>
+<p>Telemetrix was designed to be user-extensible.</p>
+<p>I've created a
+<a href="https://mryslab.github.io/bits-n-bots/2025/05/20/telemetrix-under-the-hood--part-1/">five-part blog post explaining</a>
+Telemetrix's underpinnings.</p>
+<p>Although the article discusses the Arduino UNO R4 Minima, the concepts are the same for all other boards.</p>
+<p>If you have any questions, you can contact me at 
+<a href="mailto:MisterYsLab@gmail.com">MisterYsLab@gmail.com</a>.</p>
 
 
 
