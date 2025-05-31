@@ -28,6 +28,9 @@ This library supports the following features:
 
 A [User's Guide](https://mryslab.github.io/telemetrix-nano-2040-wifi/) explaining installation and use is available online.
 
+If you wish to extend Telemetrix's capabilities, a tutorial on how to do so is [available](https://mryslab.github.io/bits-n-bots/2025/05/20/telemetrix-under-the-hood--part-1/).
+
+
 The Python API for may be found [here.](https://htmlpreview.github.io/?https://github.com/MrYsLab/telemetrix-nano-2040-wifi/blob/master/html/tmx_nano2040_wifi/index.html) 
 
 
